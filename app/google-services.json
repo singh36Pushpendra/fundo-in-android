@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "774064708929",
+    "project_id": "fundo-3f65a",
+    "storage_bucket": "fundo-3f65a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774064708929:android:a67d7a8ff01d9fdb95d5c0",
+        "android_client_info": {
+          "package_name": "com.example.fundo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "774064708929-ege1qe1218ft2d7o2ubnha2iebabh0dg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTpKD8HTdu63j2iqSN211z1nO8d_VjEO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "774064708929-ege1qe1218ft2d7o2ubnha2iebabh0dg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

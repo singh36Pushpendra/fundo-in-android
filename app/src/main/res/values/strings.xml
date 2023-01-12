@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">FunDo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="login_your_fundo">Login Your FunDo</string>
+    <string name="register_fundo">Register FunDo</string>
+    <string name="already_have_account">Already Have Account?</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="or">OR</string>
+    <string name="register">register</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="email">Email</string>
+</resources>
