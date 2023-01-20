@@ -1,18 +1,22 @@
 package com.example.fundo
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.example.fundo.model.User
+import com.example.fundo.model.UserAuthService
 import com.example.fundo.util.FunDoUtil
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.example.fundo.viewmodel.RegisterViewModel
+import com.example.fundo.viewmodel.factory.RegisterViewModelFactory
 
 class RegistrationFragment : Fragment(R.layout.fragment_registration) {
 
@@ -22,12 +26,11 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
     private lateinit var etPassword: EditText
     private lateinit var etConfirmPassword: EditText
     private lateinit var btnRegister: Button
-
+    private lateinit var alreadyHaveAccount: TextView
+    
     private lateinit var progressDialog: ProgressDialog
 
-    // Firebase instances.
-    private lateinit var mAuth: FirebaseAuth
-    private lateinit var mUser: FirebaseUser
+    private lateinit var registerViewModel: RegisterViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +38,7 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_registration, container, false)
 
+        registerViewModel = ViewModelProvider(this, RegisterViewModelFactory(UserAuthService())).get(RegisterViewModel::class.java)
         with(view) {
             etFirstName = findViewById(R.id.etFirstName)
             etLastName = findViewById(R.id.etLastName)
@@ -42,22 +46,24 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
             etPassword = findViewById(R.id.etPassword)
             etConfirmPassword = findViewById(R.id.etConfirmPassword)
             btnRegister = findViewById(R.id.btnRegister)
+            alreadyHaveAccount = findViewById(R.id.alreadyHaveAccount)
         }
 
         progressDialog = ProgressDialog(view.context)
 
-        mAuth = FirebaseAuth.getInstance()
-        mUser = mAuth.currentUser!!
-
         btnRegister.setOnClickListener {
 
-            validateContacts()
+            registerUser()
+        }
+
+        alreadyHaveAccount.setOnClickListener {
+            FunDoUtil.replaceFragment(activity, R.id.usersFrameLayout, LoginFragment())
         }
         // Inflate the layout for this fragment
         return view
     }
 
-    private fun validateContacts() {
+    private fun registerUser() {
         val firstName: String = etFirstName.text.toString()
         val lastName: String = etLastName.text.toString()
         val email: String = etEmail.text.toString()
@@ -77,24 +83,18 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
                 progressDialog.setCanceledOnTouchOutside(false)
                 progressDialog.show()
 
-                mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                val user = User(firstName, lastName, email, password)
+                registerViewModel.registerUser(user)
+                registerViewModel.userRegisterStatus.observe(viewLifecycleOwner) {
                     progressDialog.dismiss()
-                    if (it.isSuccessful) {
-                        sendUserToNextPage()
-                        Toast.makeText(context, "Registration Successful!", Toast.LENGTH_SHORT)
-                            .show()
+                    if (it.status) {
+                        replaceFragment(activity, R.id.usersFrameLayout, HomeFragment())
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(context, "${it.exception}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
     }
-
-    private fun sendUserToNextPage() {
-        fragmentManager?.run {
-            beginTransaction().replace(R.id.usersFrameLayout, HomeFragment()).commit()
-        }
-    }
-
 }

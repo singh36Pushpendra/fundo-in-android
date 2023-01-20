@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "774064708929-vu7e87p19qns50tskcoplp8dfl15i2cg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fundo",
+            "certificate_hash": "83cb28a61f24d54563829a6181bcf1a9978e92b1"
+          }
+        },
+        {
           "client_id": "774064708929-ege1qe1218ft2d7o2ubnha2iebabh0dg.apps.googleusercontent.com",
           "client_type": 3
         }

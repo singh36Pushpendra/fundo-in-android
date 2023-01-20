@@ -154,7 +154,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/edit_text_bg"
+                android:background="@drawable/button_bg"
                 android:text="@string/register"
                 android:textColor="@android:color/white"
                 app:layout_constraintEnd_toEndOf="@+id/etConfirmPassword"
