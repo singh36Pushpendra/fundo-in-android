@@ -2,8 +2,6 @@ package com.example.fundo.util
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.example.fundo.R
-import com.example.fundo.RegistrationFragment
 
 class FunDoUtil {
     companion object {

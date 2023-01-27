@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    tools:context=".HomeFragment">
+    tools:context=".view.HomeFragment">
 
     <include layout="@layout/custom_toolbar"/>
 
@@ -22,10 +22,10 @@
     </com.google.android.material.navigation.NavigationView>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/noteView"
+        android:id="@+id/noteRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"/>
+        android:layout_marginTop="100dp"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.example.fundo
+package com.example.fundo.view
 
 import android.app.ProgressDialog
 import android.os.Bundle
@@ -10,8 +10,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.fundo.R
 import com.example.fundo.model.User
 import com.example.fundo.model.UserAuthService
 import com.example.fundo.util.FunDoUtil
@@ -83,7 +83,7 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
                 progressDialog.setCanceledOnTouchOutside(false)
                 progressDialog.show()
 
-                val user = User(firstName, lastName, email, password)
+                val user = User(firstName, lastName, email, password, "")
                 registerViewModel.registerUser(user)
                 registerViewModel.userRegisterStatus.observe(viewLifecycleOwner) {
                     progressDialog.dismiss()

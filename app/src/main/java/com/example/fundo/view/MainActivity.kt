@@ -1,12 +1,8 @@
-package com.example.fundo
+package com.example.fundo.view
 
 import android.os.Bundle
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
+import com.example.fundo.R
 
 class MainActivity : AppCompatActivity() {
 

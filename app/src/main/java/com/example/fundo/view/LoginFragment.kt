@@ -1,4 +1,4 @@
-package com.example.fundo
+package com.example.fundo.view
 
 import android.app.Activity
 import android.app.ProgressDialog
@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.fundo.R
 import com.example.fundo.model.User
 import com.example.fundo.model.UserAuthService
 import com.example.fundo.util.FunDoUtil
@@ -148,7 +149,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     show()
                 }
 
-                val user = User("", "", username, password)
+                val user = User("", "", username, password, "")
                 loginViewModel.loginUser(user)
 
                 loginViewModel.userLoginStatus.observe(viewLifecycleOwner) {

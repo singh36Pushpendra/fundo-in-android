@@ -1,4 +1,4 @@
-package com.example.fundo
+package com.example.fundo.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.fundo.R
 import com.example.fundo.util.FunDoUtil
 import com.google.firebase.auth.FirebaseAuth
 

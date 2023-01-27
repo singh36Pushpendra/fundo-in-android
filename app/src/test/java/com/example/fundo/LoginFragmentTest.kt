@@ -1,5 +1,6 @@
 package com.example.fundo
 
+import com.example.fundo.view.LoginFragment
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
