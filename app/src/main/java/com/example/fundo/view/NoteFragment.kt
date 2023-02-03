@@ -9,13 +9,17 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
+import com.example.fundo.db.DBHelper
 import com.example.fundo.model.Note
 import com.example.fundo.model.NoteAuthService
 import com.example.fundo.util.FunDoUtil
 import com.example.fundo.viewmodel.NoteViewModel
 import com.example.fundo.viewmodel.factory.NoteViewModelFactory
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 
 class NoteFragment : Fragment() {
 
@@ -33,7 +37,7 @@ class NoteFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_note, container, false)
 
-        noteViewModel = ViewModelProvider(this, NoteViewModelFactory(NoteAuthService()))[NoteViewModel::class.java]
+        noteViewModel = ViewModelProvider(this, NoteViewModelFactory(NoteAuthService(DBHelper(requireContext()))))[NoteViewModel::class.java]
         with(view) {
 
             noteTopAppBar = findViewById(R.id.noteTopAppBar)
@@ -55,6 +59,18 @@ class NoteFragment : Fragment() {
             FunDoUtil.replaceFragment(activity, R.id.usersFrameLayout, HomeFragment())
         }
 
+        noteTopAppBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.noteReminder -> {
+                    NoteReminderFragment().show(activity?.supportFragmentManager!!, "Note Reminder Dialog")
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
+
         fabSaveNote.setOnClickListener {
             val title = etTitle.text.toString()
             val content = etNote.text.toString()
@@ -62,7 +78,7 @@ class NoteFragment : Fragment() {
             val note: Note
             val anyNoteId = arguments?.get("noteId")
             if (anyNoteId == null) {
-                note = Note("", title, content)
+                note = Note(null, title, content)
             }
             else {
                 note = Note(anyNoteId.toString(), title, content)

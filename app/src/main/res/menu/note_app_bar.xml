@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/search"
+        android:id="@+id/noteReminder"
         android:icon="@drawable/ic_notification_add"
         android:title="Notification"
         app:showAsAction="ifRoom" />

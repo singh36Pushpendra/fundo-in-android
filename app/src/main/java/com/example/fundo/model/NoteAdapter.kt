@@ -51,7 +51,14 @@ class NoteAdapter(
             popupMenu.show()
             popupMenu.setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.archiveNote -> {}
+                    R.id.archiveNote -> {
+                        val bundle = Bundle()
+                        bundle.putString("noteId", noteId)
+                        bundle.putString("archiveNote", "archiveNote")
+                        val homeFragment = HomeFragment()
+                        homeFragment.arguments = bundle
+                        FunDoUtil.replaceFragment((context as AppCompatActivity), R.id.usersFrameLayout, homeFragment)
+                    }
                     R.id.editNote -> {
                         val noteFragment = NoteFragment()
                         val bundle = Bundle()
@@ -64,6 +71,7 @@ class NoteAdapter(
                     R.id.deleteNote -> {
                         val bundle = Bundle()
                         bundle.putString("noteId", noteId)
+                        bundle.putString("deleteNote", "deleteNote")
                         val homeFragment = HomeFragment()
                         homeFragment.arguments = bundle
                         FunDoUtil.replaceFragment((context as AppCompatActivity), R.id.usersFrameLayout, homeFragment)
