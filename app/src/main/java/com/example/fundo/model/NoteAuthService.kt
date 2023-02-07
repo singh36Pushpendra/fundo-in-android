@@ -54,15 +54,22 @@ class NoteAuthService(val db: DBHelper) {
     fun getNotes(listener: (NoteAuthListener) -> Unit) {
         fStore.collection("users_info").document(mAuth.currentUser!!.uid).collection("notes_info")
             .get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    listener(NoteAuthListener(it.result.documents, true, "Notes fetched!"))
-                    for (document in it.result) {
-                        Log.d(TAG, document.id + " => " + document.data)
+            .addOnCompleteListener { documents ->
+                val noteSets = mutableListOf<Note>()
+                if (documents.isSuccessful) {
+                    for (document in documents.result) {
+                        val noteId = document["noteId"].toString()
+                        val title = document["title"].toString()
+                        val content = document["content"].toString()
+                        var isArchive = document["archive"] as Boolean
+
+                        val note=Note(noteId, title, content, isArchive)
+                        noteSets.add(note)
                     }
+                    listener(NoteAuthListener(noteSets, true, "Notes fetched!"))
                 } else {
-                    listener(NoteAuthListener(it.result.documents, false, "Notes not fetched!"))
-                    Log.w(TAG, "Error getting documents.", it.exception)
+                    listener(NoteAuthListener(emptyList(), false, "Notes not fetched!"))
+                    Log.w(TAG, "Error getting documents.", documents.exception)
                 }
             }
     }
@@ -134,6 +141,21 @@ class NoteAuthService(val db: DBHelper) {
             }
             .addOnFailureListener {
                 listener(AuthListener(false, "Note not archived!"))
+            }
+    }
+
+    fun unarchiveNote(noteId: String, listener: (AuthListener) -> Unit) {
+        val userId = mAuth.currentUser!!.uid
+        fStore.collection("users_info").document(userId).collection("notes_info")
+            .document(noteId).update("archive", false).addOnSuccessListener {
+                if (db.unarchiveNote(userId, noteId))
+                    Log.d("Unarchive", "Note unarchived successfully!")
+                else
+                    Log.d("Unarchive", "Note not unarchived!")
+                listener(AuthListener(true, "Note unarchived!"))
+            }
+            .addOnFailureListener {
+                listener(AuthListener(false, "Note not unarchived!"))
             }
     }
 }

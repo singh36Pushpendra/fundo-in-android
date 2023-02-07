@@ -17,6 +17,9 @@ class HomeViewModel(val noteAuthService: NoteAuthService): ViewModel() {
     private val _noteArchivedStatus = MutableLiveData<AuthListener>()
     val noteArchivedStatus: LiveData<AuthListener> = _noteArchivedStatus
 
+    private val _noteUnarchivedStatus = MutableLiveData<AuthListener>()
+    val noteUnarchivedStatus: LiveData<AuthListener> = _noteUnarchivedStatus
+
     fun getNotes() {
         noteAuthService.getNotes() {
             _notesStatus.value = it
@@ -32,6 +35,12 @@ class HomeViewModel(val noteAuthService: NoteAuthService): ViewModel() {
     fun archiveNote(noteId: String) {
         noteAuthService.archiveNote(noteId) {
             _noteArchivedStatus.value = it
+        }
+    }
+
+    fun unarchiveNote(noteId: String) {
+        noteAuthService.unarchiveNote(noteId) {
+            _noteUnarchivedStatus.value = it
         }
     }
 }

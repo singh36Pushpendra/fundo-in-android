@@ -1,15 +1,14 @@
 package com.example.fundo.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +16,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundo.R
+import com.example.fundo.databinding.NotesCardViewBinding
 import com.example.fundo.db.DBHelper
+import com.example.fundo.model.Note
 import com.example.fundo.model.NoteAdapter
 import com.example.fundo.model.NoteAuthService
 import com.example.fundo.util.FunDoUtil
@@ -27,7 +28,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import java.util.function.Predicate
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -47,12 +47,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private lateinit var imgViewMore: ImageView
 
+    private val unArchiveNotes = mutableListOf<Note>()
+    private val archiveNotes = mutableListOf<Note>()
+    private lateinit var noteAdapter: NoteAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+
 
         homeViewModel = ViewModelProvider(this, HomeViewModelFactory(NoteAuthService(DBHelper(
             requireContext()
@@ -66,21 +70,27 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             noteRecyclerView = findViewById(R.id.noteRecyclerView)
         }
 
+
+        (activity as AppCompatActivity).setSupportActionBar(topAppBar)
+        setHasOptionsMenu(true)
+
         homeViewModel.getNotes()
 
         homeViewModel.notesStatus.observe(viewLifecycleOwner) { noteAuthListener ->
             noteRecyclerView.layoutManager = GridLayoutManager(context, 2)
-            val unArchiveNotes = noteAuthListener.notesList.filter {
-                it.get("archive") == false
+            noteAuthListener.notesList.forEach {
+                if (it.isArchive == false)
+                    unArchiveNotes.add(it)
+                else
+                    archiveNotes.add(it)
             }
-            val noteAdapter = NoteAdapter(requireContext(), unArchiveNotes)
+            noteAdapter = NoteAdapter(requireContext(), unArchiveNotes)
             noteRecyclerView.adapter = noteAdapter
         }
 
         if (arguments != null) {
-            val noteId = arguments?.get("noteId").toString()
-            if (arguments?.get("deleteNote") != null) {
-                homeViewModel.deleteNote(noteId)
+            if (arguments?.get("deleteNoteId") != null) {
+                homeViewModel.deleteNote(arguments?.get("deleteNoteId").toString())
                 homeViewModel.noteDeletionStatus.observe(viewLifecycleOwner) {
                     if (it.status) {
                         Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
@@ -90,9 +100,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 }
             }
 
-            if (arguments?.get("archiveNote") != null) {
-                homeViewModel.archiveNote(noteId)
+            if (arguments?.get("archiveNoteId") != null) {
+                homeViewModel.archiveNote(arguments?.get("archiveNoteId").toString())
                 homeViewModel.noteArchivedStatus.observe(viewLifecycleOwner) {
+                    if (it.status) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            if (arguments?.get("unarchiveNoteId") != null) {
+                homeViewModel.unarchiveNote(arguments?.get("unarchiveNoteId").toString())
+                homeViewModel.noteUnarchivedStatus.observe(viewLifecycleOwner) {
                     if (it.status) {
                         Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                     } else {
@@ -104,10 +125,34 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         topAppBar.setNavigationOnClickListener {
             drawerLayout.open()
         }
+        navView.setNavigationItemSelectedListener {
+            // Handle menu item selected
+            when (it.itemId) {
+                R.id.signOut -> {
+                    Log.d("Sign Out", "Working Fine!")
+                    Toast.makeText(context, "It's working!", Toast.LENGTH_SHORT).show()
+                }
+                R.id.archive -> {
+                }
+                else -> {}
+            }
+            true
+        }
 
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.search -> {
+                    true
+                }
+                R.id.archives -> {
+
+//                    imgViewMore = NotesCardViewBinding.inflate(layoutInflater).imgViewMore
+//                    val popupMenu = PopupMenu(context, imgViewMore)
+//
+//                    popupMenu.menuInflater.inflate(R.menu.note_popup_menu, popupMenu.menu)
+//                    popupMenu.menu.getItem(0).title = "Unarchive"
+                    val noteAdapter = NoteAdapter(requireContext(), archiveNotes)
+                    noteRecyclerView.adapter = noteAdapter
                     true
                 }
                 R.id.recyclerView -> {
@@ -147,26 +192,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         actionBarDrawerToggle.syncState()
         activity?.actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        navView.setNavigationItemSelectedListener {
-            // Handle menu item selected
-            it.isChecked = true
-            drawerLayout.close()
-            if (it.itemId == R.id.signOut) {
-                Log.d("Sign Out", "Working Fine!")
-                Toast.makeText(context, "It's working!", Toast.LENGTH_SHORT).show()
-            }
-            true
-        }
         return view
     }
 
-    @SuppressLint("LongLogTag")
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.signOut) {
-            Log.d("Sign Out OnOptionsItemSelected", "Working Fine!")
-            Toast.makeText(context, "It's working!", Toast.LENGTH_SHORT).show()
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        requireActivity().menuInflater.inflate(R.menu.top_app_bar, menu)
+        val search = menu.findItem(R.id.search)
+        val searchView: SearchView = search.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                noteAdapter.filter.filter(newText)
+                return true
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
 }

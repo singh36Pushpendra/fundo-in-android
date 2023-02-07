@@ -6,22 +6,25 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundo.R
 import com.example.fundo.util.FunDoUtil
 import com.example.fundo.view.HomeFragment
 import com.example.fundo.view.NoteFragment
-import com.google.firebase.firestore.DocumentSnapshot
 
 class NoteAdapter(
     val context: Context,
-    private val notesList: List<DocumentSnapshot>
+    private val notesList: MutableList<Note>
 ) :
-    RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
+    RecyclerView.Adapter<NoteAdapter.ViewHolder>(), Filterable {
+
+    private val notesListAll: MutableList<Note>
+
+    init {
+        notesListAll = ArrayList<Note>(notesList)
+    }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvCardTitle = itemView.findViewById<TextView>(R.id.tvCardTitle)
@@ -38,11 +41,11 @@ class NoteAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val documentSnapshot = notesList[position]
+        val note = notesList[position]
 
-        holder.tvCardTitle.text = documentSnapshot.get("title").toString()
-        holder.tvCardNote.text = documentSnapshot.get("content").toString()
-        val noteId = documentSnapshot.get("noteId").toString()
+        holder.tvCardTitle.text = note.title
+        holder.tvCardNote.text = note.content
+        val noteId = note.noteId
 
         val imgViewMore = holder.imgViewMore
         imgViewMore.setOnClickListener {
@@ -53,8 +56,11 @@ class NoteAdapter(
                 when (it.itemId) {
                     R.id.archiveNote -> {
                         val bundle = Bundle()
-                        bundle.putString("noteId", noteId)
-                        bundle.putString("archiveNote", "archiveNote")
+
+                        if (it.title.toString() == "Archive")
+                            bundle.putString("archiveNoteId", noteId)
+                        else
+                            bundle.putString("unarchiveNoteId", noteId)
                         val homeFragment = HomeFragment()
                         homeFragment.arguments = bundle
                         FunDoUtil.replaceFragment((context as AppCompatActivity), R.id.usersFrameLayout, homeFragment)
@@ -70,8 +76,7 @@ class NoteAdapter(
                     }
                     R.id.deleteNote -> {
                         val bundle = Bundle()
-                        bundle.putString("noteId", noteId)
-                        bundle.putString("deleteNote", "deleteNote")
+                        bundle.putString("deleteNoteId", noteId)
                         val homeFragment = HomeFragment()
                         homeFragment.arguments = bundle
                         FunDoUtil.replaceFragment((context as AppCompatActivity), R.id.usersFrameLayout, homeFragment)
@@ -85,5 +90,35 @@ class NoteAdapter(
 
     override fun getItemCount(): Int {
         return notesList.size
+    }
+
+    override fun getFilter(): Filter {
+        return filteration
+    }
+
+    val filteration: Filter = object : Filter() {
+        // Runs on a background thread.
+        override fun performFiltering(charSequence: CharSequence?): FilterResults {
+            val filteredNotes = mutableListOf<Note>()
+            if (charSequence.toString().isEmpty())
+                filteredNotes.addAll(notesListAll)
+            else {
+                notesListAll.forEach {
+                    val title = it.title
+                    if (title.lowercase().contains(charSequence.toString().lowercase()))
+                        filteredNotes.add(it)
+                }
+            }
+            val filterResults = FilterResults()
+            filterResults.values = filteredNotes
+            return filterResults
+        }
+
+        // Runs on a UI thread.
+        override fun publishResults(charSequence: CharSequence?, filterResults: FilterResults?) {
+            notesList.clear()
+            notesList.addAll(filterResults!!.values as Collection<Note>)
+            notifyDataSetChanged()
+        }
     }
 }

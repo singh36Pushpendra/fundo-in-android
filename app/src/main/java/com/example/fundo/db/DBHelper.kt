@@ -73,6 +73,15 @@ class DBHelper(val context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
     }
 
     fun archiveNote(userId: String, noteId: String): Boolean {
+        return updateIsArchive(userId, noteId, true)
+
+    }
+
+    fun unarchiveNote(userId: String, noteId: String): Boolean {
+        return updateIsArchive(userId, noteId, false)
+    }
+
+    private fun updateIsArchive(userId: String, noteId: String, b: Boolean): Boolean {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -84,4 +93,5 @@ class DBHelper(val context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 
             arrayOf(userId, noteId)
         ) > 0
     }
+
 }

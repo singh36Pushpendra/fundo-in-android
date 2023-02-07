@@ -4,19 +4,24 @@
     <item android:id="@+id/search"
         android:title="@string/search_title"
         android:icon="@drawable/ic_search"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.widget.SearchView" />
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
+    <item
+        android:id="@+id/archives"
+        android:title="@string/archive"
+        android:icon="@drawable/ic_archive"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/recyclerView"
         android:icon="@drawable/ic_linear_view"
         android:title="@string/views"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/account"
         android:icon="@drawable/ic_circle"
         android:title="@string/account"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>
