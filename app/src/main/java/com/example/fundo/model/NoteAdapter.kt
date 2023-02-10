@@ -16,7 +16,8 @@ import com.example.fundo.view.NoteFragment
 
 class NoteAdapter(
     val context: Context,
-    private val notesList: MutableList<Note>
+    private val notesList: MutableList<Note>,
+    var archiveTitle: String = "Archive"
 ) :
     RecyclerView.Adapter<NoteAdapter.ViewHolder>(), Filterable {
 
@@ -51,6 +52,7 @@ class NoteAdapter(
         imgViewMore.setOnClickListener {
             val popupMenu = PopupMenu(context, imgViewMore)
             popupMenu.menuInflater.inflate(R.menu.note_popup_menu, popupMenu.menu)
+            popupMenu.menu.findItem(R.id.archiveNote).title = archiveTitle
             popupMenu.show()
             popupMenu.setOnMenuItemClickListener {
                 when (it.itemId) {

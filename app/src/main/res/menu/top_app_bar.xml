@@ -8,11 +8,6 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
     <item
-        android:id="@+id/archives"
-        android:title="@string/archive"
-        android:icon="@drawable/ic_archive"
-        app:showAsAction="always"/>
-    <item
         android:id="@+id/recyclerView"
         android:icon="@drawable/ic_linear_view"
         android:title="@string/views"

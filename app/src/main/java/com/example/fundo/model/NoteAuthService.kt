@@ -9,17 +9,24 @@ import android.util.Log
 import com.example.fundo.db.DBHelper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 
 class NoteAuthService(val db: DBHelper) {
+
+    private var flag: Boolean = true
 
     // Firebase instance.
     private var mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     // Firestore instance.
     private var fStore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val limit = 13
 
+    private lateinit var lastVisible: DocumentSnapshot
+    var isLastItemReached = false
     fun storeNote(note: Note, listener: (AuthListener) -> Unit) {
         val userId = mAuth.currentUser?.uid.toString()
         val collectionReference =
@@ -52,8 +59,25 @@ class NoteAuthService(val db: DBHelper) {
     }
 
     fun getNotes(listener: (NoteAuthListener) -> Unit) {
-        fStore.collection("users_info").document(mAuth.currentUser!!.uid).collection("notes_info")
-            .get()
+        val usersRef = fStore.collection("users_info")
+        val notesRef =
+            usersRef.document(FirebaseAuth.getInstance().currentUser!!.uid).collection("notes_info")
+
+        var query: Query
+        if (flag) {
+
+            query =
+                notesRef.orderBy("title", Query.Direction.ASCENDING).limit(limit.toLong())
+            flag = false
+        } else {
+
+            query =
+                notesRef.orderBy("title", Query.Direction.ASCENDING).startAfter(lastVisible)
+                    .limit(limit.toLong())
+        }
+
+        if (!isLastItemReached) {
+        query.get()
             .addOnCompleteListener { documents ->
                 val noteSets = mutableListOf<Note>()
                 if (documents.isSuccessful) {
@@ -63,15 +87,22 @@ class NoteAuthService(val db: DBHelper) {
                         val content = document["content"].toString()
                         var isArchive = document["archive"] as Boolean
 
-                        val note=Note(noteId, title, content, isArchive)
+                        val note = Note(noteId, title, content, isArchive)
                         noteSets.add(note)
                     }
                     listener(NoteAuthListener(noteSets, true, "Notes fetched!"))
+
+                    lastVisible =
+                        documents.result.documents[documents.result.size() - 1]
+                    if (documents.result.size() < limit) {
+                        isLastItemReached = true
+                    }
                 } else {
                     listener(NoteAuthListener(emptyList(), false, "Notes not fetched!"))
                     Log.w(TAG, "Error getting documents.", documents.exception)
                 }
             }
+        }
     }
 
     fun deleteNote(noteId: String, listener: (AuthListener) -> Unit) {
