@@ -11,8 +11,14 @@ class LoginViewModel(val userAuthService: UserAuthService): ViewModel() {
     private val _userLoginStatus = MutableLiveData<AuthListener>()
     val userLoginStatus: LiveData<AuthListener> = _userLoginStatus
 
-    fun loginUser(user: User) {
-        userAuthService.loginUser(user) {
+//    fun loginUser(user: User) {
+//        userAuthService.loginUser(user) {
+//            _userLoginStatus.value = it
+//        }
+//    }
+
+    fun loginWithRestApi(email: String, password: String) {
+        userAuthService.apiLogin(email, password) {
             _userLoginStatus.value = it
         }
     }

@@ -3,6 +3,10 @@ package com.example.fundo.model
 import android.content.ContentValues
 import android.net.Uri
 import android.util.Log
+import com.example.fundo.restapi.Constant
+import com.example.fundo.restapi.LoginListener
+import com.example.fundo.restapi.LoginLoader
+import com.example.fundo.restapi.LoginResponse
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -107,5 +111,24 @@ class UserAuthService {
 
     fun getNotes() {
 
+    }
+
+    fun apiLogin(email: String, password: String, listener: (AuthListener) -> Unit) {
+        val loader = LoginLoader()
+        loader.getLoginDone(object : LoginListener {
+            override fun onLogin(loginResponse: LoginResponse?, status: Boolean) {
+                if (status) {
+                    if (loginResponse != null) {
+                        val constant = Constant.getInstance()
+                        constant.setUserId(loginResponse.localId)
+                        listener(AuthListener(true, "Login successful with rest api!"))
+                    }
+                }
+                else {
+                    listener(AuthListener(true, "Login failed with rest api!"))
+                }
+            }
+
+        }, email, password)
     }
 }

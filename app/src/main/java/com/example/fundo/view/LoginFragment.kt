@@ -150,8 +150,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 }
 
                 val user = User("", "", username, password, "")
-                loginViewModel.loginUser(user)
+//                loginViewModel.loginUser(user)
 
+                loginViewModel.loginWithRestApi(username, password)
+
+                Toast.makeText(context, "after loginWithRestApi", Toast.LENGTH_SHORT).show()
                 loginViewModel.userLoginStatus.observe(viewLifecycleOwner) {
                     progressDialog.dismiss()
                     if (it.status) {
